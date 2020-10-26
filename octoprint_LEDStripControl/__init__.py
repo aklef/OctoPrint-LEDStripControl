@@ -147,7 +147,7 @@ class LEDStripControlPlugin(octoprint.plugin.AssetPlugin,
 					v = 255.0 #assume maximum  brightness desired
 				v = v/255.0 * 100.0 # convert RGB to RPi dutycycle
 				v = max(min(v, 100.0), 0.0) # clamp the value 0]v[100
-				dutycycles[letter] = v
+				dutycycles[letter] = 255-v
 				self._logger.debug(u"matchedParams 1: %s 2: %s" % (letter, v))
 
 			for l in dutycycles.keys():
