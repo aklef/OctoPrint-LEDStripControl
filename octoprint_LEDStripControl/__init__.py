@@ -145,9 +145,10 @@ class LEDStripControlPlugin(octoprint.plugin.AssetPlugin,
 				except ValueError:
 					# the parameter value was unspecified or invalid
 					v = 255.0 #assume maximum  brightness desired
+				v = 255-v
 				v = v/255.0 * 100.0 # convert RGB to RPi dutycycle
 				v = max(min(v, 100.0), 0.0) # clamp the value 0]v[100
-				dutycycles[letter] = 255-v
+				dutycycles[letter] = v
 				self._logger.debug(u"matchedParams 1: %s 2: %s" % (letter, v))
 
 			for l in dutycycles.keys():
