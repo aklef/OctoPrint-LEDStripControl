@@ -132,7 +132,8 @@ class LEDStripControlPlugin(octoprint.plugin.AssetPlugin,
 			self._logger.debug(u"M150 Detected: %s" % (cmd,))
 			# Emulating Marlin 1.1.0's syntax
 			# https://github.com/MarlinFirmware/Marlin/blob/RC/Marlin/Marlin_main.cpp#L6133
-			dutycycles = {'r':100.0, 'g':100.0, 'b':100.0, 'w':100.0}
+			z = 100.0
+			dutycycles = {'r':z, 'g':z, 'b':z, 'w':z}
 			for matchedParams in re.finditer(r'([RGUBWrgubw]) *(\d*)', cmd):
 				letter = matchedParams.group(1).lower() #convert to lowercase
 
