@@ -125,25 +125,29 @@ class LEDStripControlPlugin(octoprint.plugin.AssetPlugin,
 		self._unregister_leds()
 		self._pigpiod.stop()
 
+	# This handles Upper and lowercase M150 parameters
+	# also automatically converts G to U parameters for Marlin
 	def HandleM150(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
 		if gcode and cmd.startswith("M150"):
 			self._logger.debug(u"M150 Detected: %s" % (cmd,))
 			# Emulating Marlin 1.1.0's syntax
 			# https://github.com/MarlinFirmware/Marlin/blob/RC/Marlin/Marlin_main.cpp#L6133
-			dutycycles = {'r':0.0, 'g':0.0, 'b':0.0, 'w':0.0}
-			for match in re.finditer(r'([RGUBWrgubw]) *(\d*)', cmd):
-				k = match.group(1).lower()
+			dutycycles = {'r':100.0, 'g':100.0, 'b':100.0, 'w':100.0}
+			for matchedParams in re.finditer(r'([RGUBWrgubw]) *(\d*)', cmd):
+				letter = matchedParams.group(1).lower() #convert to lowercase
+
 				# Marlin uses RUB instead of RGB
-				if k == 'u': k = 'g'
+				if letter == 'u': letter = 'g'
+
 				try:
-					v = float(match.group(2))
+					v = float(matchedParams.group(2))
 				except ValueError:
-					# more than likely match.group(2) was unspecified
-					v = 255.0
+					# the parameter value was unspecified or invalid
+					v = 255.0 #assume maximum  brightness desired
 				v = v/255.0 * 100.0 # convert RGB to RPi dutycycle
-				v = max(min(v, 100.0), 0.0) # clamp the value
-				dutycycles[k] = v
-				self._logger.debug(u"match 1: %s 2: %s" % (k, v))
+				v = max(min(v, 100.0), 0.0) # clamp the value 0]v[100
+				dutycycles[letter] = v
+				self._logger.debug(u"matchedParams 1: %s 2: %s" % (letter, v))
 
 			for l in dutycycles.keys():
 				if self._leds[l]:
